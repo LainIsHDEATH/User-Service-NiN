@@ -1,0 +1,36 @@
+networks:
+  microservices-net:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:16
+    mem_limit: 1g
+    cpuset: "0,1"
+    container_name: postgres-service
+    environment:
+      POSTGRES_DB: nikchemno_i_nesmachno_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./local_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    networks:
+      - microservices-net
+
+  user-service:
+    build: /
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nikchemno_i_nesmachno_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+    networks:
+      - microservices-net

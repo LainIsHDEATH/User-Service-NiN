@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+  datasource:
+    jpa:
+      properties:
+        hibernate:
+          default_schema: user_service
+          format_sql: true
+          ddl-auto: validate
+      show-sql: true
+  cloud:
+    config:
+      enabled: false
+  euraka:
+    client:
+      enabled: false
+
+jwt:
+  secret: SECRET
+
+logging:
+  level:
+    root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health, info, metrics"

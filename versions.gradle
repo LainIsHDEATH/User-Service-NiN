@@ -1,0 +1,8 @@
+ext {
+    versions = [
+            "auth0": "4.5.0",
+            "logstash": "8.1",
+            "springdoc": '2.8.9',
+            "mapstruct": "1.6.3"
+    ]
+}
