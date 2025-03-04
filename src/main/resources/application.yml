@@ -4,30 +4,7 @@ server:
 spring:
   application:
     name: user-service
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: 844450274439-ess0u5v4nk2j567me7qsodf8spr7344h.apps.googleusercontent.com
-            client-secret: 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
-            scope: profile, email
-            redirect-uri: "http://localhost/api/oauth2/google"
-          github:
-            client-id: Ov23lib9UtwdmWgU39XL
-            client-secret: de0e3d6354ca0f103b15b515d369d2ce64f29aa8
-            scope: read:user, user:email
-            redirect-uri: "http://localhost/api/oauth2/github"
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/auth
-            token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-          github:
-            authorization-uri: https://github.com/login/oauth/authorize
-            token-uri: https://github.com/login/oauth/access_token
-            user-info-uri: https://api.github.com/user
-            user-name-attribute: login
+
   datasource:
     jpa:
       properties:
