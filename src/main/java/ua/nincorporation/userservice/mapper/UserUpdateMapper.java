@@ -15,6 +15,7 @@ public final class UserUpdateMapper {
     private final PasswordEncoder passwordEncoder;
 
     public User update(User user, UserUpdateDTO updatedUser) {
+        if (user == null) return null;
         if (updatedUser == null) return user;
 
         Optional.ofNullable(updatedUser.username())
@@ -32,6 +33,6 @@ public final class UserUpdateMapper {
 
         Optional.ofNullable(updatedUser.dateOfBirth())
                 .ifPresent(user::setDateOfBirth);
-            return user;
+        return user;
     }
 }

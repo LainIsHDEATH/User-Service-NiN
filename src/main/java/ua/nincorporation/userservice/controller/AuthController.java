@@ -23,11 +23,8 @@ import ua.nincorporation.userservice.model.User;
 import ua.nincorporation.userservice.security.CustomUserDetails;
 import ua.nincorporation.userservice.security.JWTUtil;
 import ua.nincorporation.userservice.service.AuthenticationService;
-import ua.nincorporation.userservice.service.UserService;
-import ua.nincorporation.userservice.util.UserValidator;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j

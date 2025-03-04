@@ -12,20 +12,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Component
 public class JWTUtil {
 
+    private static final String CLAIM_USER_ID = "userId";
+    private static final String CLAIM_USERNAME = "username";
+    private static final String CLAIM_ROLES = "roles";
+
     private final String issuer;
-    private final String subject;
-    private final long expiresMinutes;
+    private final Duration expiration;
 
     private final Algorithm algorithm;
     @Getter
@@ -35,13 +36,11 @@ public class JWTUtil {
             @Value("${jwt.secret}") String secretKey,
             @Value("${jwt.secret-base64:false}") boolean secretIsBase64,
             @Value("${jwt.issuer:NiN}") String issuer,
-            @Value("${jwt.subject:User details}") String subject,
             @Value("${jwt.expiration-minutes:60}") long expiresMinutes,
             @Value("${jwt.leeway-seconds:60}") long leewaySeconds
     ) {
         this.issuer = issuer;
-        this.subject = subject;
-        this.expiresMinutes = expiresMinutes;
+        this.expiration = Duration.ofMinutes(expiresMinutes);
 
         byte[] secretBytes = secretIsBase64
                 ? Base64.getDecoder().decode(secretKey)
@@ -51,81 +50,77 @@ public class JWTUtil {
 
         this.verifier = JWT.require(algorithm)
                 .withIssuer(this.issuer)
-                .withSubject(this.subject)
                 .acceptLeeway(leewaySeconds)
                 .build();
     }
 
-    public String generateToken(Long userId, String username) {
-        Instant now = Instant.now();
-        Date issuedAt = Date.from(now);
-        Date expiresAt = Date.from(now.plus(expiresMinutes, ChronoUnit.MINUTES));
-
-        return JWT.create()
-                .withSubject(subject)
-                .withIssuer(issuer)
-                .withIssuedAt(issuedAt)
-                .withExpiresAt(expiresAt)
-                .withClaim("userId", userId)
-                .withClaim("username", username)
-                .sign(algorithm);
-    }
-
     public String generateToken(Long userId, String username, Collection<String> roles) {
         Instant now = Instant.now();
-        Date issuedAt = Date.from(now);
-        Date expiresAt = Date.from(now.plus(expiresMinutes, ChronoUnit.MINUTES));
+        Instant issuedAt = Instant.from(now);
+        Instant expiresAt = Instant.from(now.plus(expiration));
 
         var builder = JWT.create()
-                .withSubject(subject)
+                .withSubject(userId == null ? "" : String.valueOf(userId))
                 .withIssuer(issuer)
                 .withIssuedAt(issuedAt)
                 .withExpiresAt(expiresAt)
-                .withClaim("userId", userId)
-                .withClaim("username", username);
+                .withClaim(CLAIM_USER_ID, userId)
+                .withClaim(CLAIM_USERNAME, username);
 
         if (roles != null && !roles.isEmpty()) {
-            builder.withArrayClaim("role", roles.toArray(new String[0]));
+            builder.withArrayClaim(CLAIM_ROLES, roles.toArray(new String[0]));
         }
 
         return builder.sign(algorithm);
     }
 
-    public Optional<String> tryExtractUsername(String token) {
-        try {
-            DecodedJWT decoded = verifier.verify(token);
-            return Optional.ofNullable(decoded.getClaim("username").asString());
-        } catch (JWTVerificationException e) {
-            log.debug("Failed to verify JWT when extracting username: {}", e.getMessage());
-            return Optional.empty();
-        }
+    public String generateToken(Long userId, String username) {
+        return generateToken(userId, username, Collections.emptyList());
     }
 
     public Optional<Long> tryExtractUserId(String token) {
         try {
             DecodedJWT decoded = verifier.verify(token);
-            return Optional.ofNullable(decoded.getClaim("userId").asLong());
+            return Optional.ofNullable(decoded.getClaim(CLAIM_USER_ID).asLong());
         } catch (JWTVerificationException e) {
             log.debug("Failed to verify JWT when extracting userId: {}", e.getMessage());
             return Optional.empty();
         }
     }
 
-    public String extractUsername(String token) {
-        return tryExtractUsername(token)
-                .orElseThrow(() -> new JwtValidationException("Invalid or expired JWT token"));
+    public Optional<String> tryExtractUsername(String token) {
+        try {
+            DecodedJWT decoded = verifier.verify(token);
+            return Optional.ofNullable(decoded.getClaim(CLAIM_USERNAME).asString());
+        } catch (JWTVerificationException e) {
+            log.debug("Failed to verify JWT when extracting username: {}", e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public List<String> tryExtractRoles(String token) {
+        try {
+            DecodedJWT decoded = verifier.verify(token);
+            String[] roles = decoded.getClaim(CLAIM_ROLES).asArray(String.class);
+            if (roles == null) return Collections.emptyList();
+            return Arrays.asList(roles);
+        } catch (JWTVerificationException e) {
+            log.debug("Failed to verify JWT when extracting roles: {}", e.getMessage());
+            return Collections.emptyList();
+        }
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
             DecodedJWT decodedJWT = verifier.verify(token);
 
-            String username = decodedJWT.getClaim("username").asString();
+            String username = decodedJWT.getClaim(CLAIM_USERNAME).asString();
 
             Date expires = decodedJWT.getExpiresAt();
             boolean notExpired = expires != null && expires.after(Date.from(Instant.now()));
 
-            return username != null && username.equals(userDetails.getUsername()) && notExpired;
+            return username != null && username.equals(userDetails.getUsername())
+                    && notExpired;
         } catch (JWTVerificationException e) {
             log.debug("JWT validation failed: {}", e.getMessage());
             return false;
@@ -133,7 +128,7 @@ public class JWTUtil {
     }
 
     public Long getExpirationSeconds() {
-        return expiresMinutes;
+        return expiration.getSeconds();
     }
 
     public static class JwtValidationException extends RuntimeException {
