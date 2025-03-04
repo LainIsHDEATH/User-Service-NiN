@@ -26,7 +26,8 @@ class UserServiceFindMethodsTest {
 
     @Mock
     private UserRepository userRepository;
-    @Mock private UserReadMapper userReadMapper;
+    @Mock
+    private UserReadMapper userReadMapper;
 
     @InjectMocks
     private UserService userService;
