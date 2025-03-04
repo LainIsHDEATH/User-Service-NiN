@@ -12,8 +12,8 @@ import ua.nincorporation.userservice.exception.ConflictException;
 import ua.nincorporation.userservice.mapper.UserCreateMapper;
 import ua.nincorporation.userservice.mapper.UserReadMapper;
 import ua.nincorporation.userservice.mapper.UserUpdateMapper;
+import ua.nincorporation.userservice.model.User;
 import ua.nincorporation.userservice.repository.UserRepository;
-import ua.nincorporation.userservice.util.UserValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -81,8 +81,8 @@ public class UserService {
                         }
                     }
 
-                    userUpdateMapper.update(user, updatedUser);
-                    return userRepository.saveAndFlush(user);
+                    User userUpdated = userUpdateMapper.update(user, updatedUser);
+                    return userRepository.saveAndFlush(userUpdated);
                 })
                 .map(userReadMapper::toDto);
     }
