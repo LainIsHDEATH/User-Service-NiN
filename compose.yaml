@@ -24,13 +24,21 @@ services:
     networks:
       - microservices-net
 
-  user-service:
-    build: /
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nikchemno_i_nesmachno_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    ports:
-      - "8081:8081"
-    networks:
-      - microservices-net
+#  user-service:
+#    env_file:
+#      - .env
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/nikchemno_i_nesmachno_db
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: postgres
+#      SPRING_APPLICATION_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-ID: ${GOOGLE_CLIENT_ID}
+#      SPRING_APPLICATION_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT-SECRET: ${GOOGLE_CLIENT_SECRET}
+#      SPRING_APPLICATION_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT-ID: ${GITHUB_CLIENT_ID}
+#      SPRING_APPLICATION_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT-SECRET: ${GITHUB_CLIENT_SECRET}
+#    ports:
+#      - "8081:8081"
+#    networks:
+#      - microservices-net

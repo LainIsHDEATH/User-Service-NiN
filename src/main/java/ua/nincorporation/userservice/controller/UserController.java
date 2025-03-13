@@ -3,24 +3,17 @@ package ua.nincorporation.userservice.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ua.nincorporation.userservice.dto.UserCreateDto;
 import ua.nincorporation.userservice.dto.UserReadDto;
 import ua.nincorporation.userservice.dto.UserUpdateDTO;
 import ua.nincorporation.userservice.service.UserService;
 
-import java.net.URI;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.ResponseEntity.*;
-import static org.springframework.http.ResponseEntity.notFound;
-import static org.springframework.http.ResponseEntity.notFound;
-import static org.springframework.http.ResponseEntity.status;
 
 @Slf4j
 @RequiredArgsConstructor

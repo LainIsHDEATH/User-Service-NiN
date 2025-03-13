@@ -9,28 +9,21 @@ spring:
       client:
         registration:
           google:
-            client-id: 844450274439-ess0u5v4nk2j567me7qsodf8spr7344h.apps.googleusercontent.com
-            client-secret: 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
-            redirect-uri: http://localhost:8081/login/oauth2/code/google
+            client-id: {GOOGLE_CLIENT_ID}
+            client-secret: {GOOGLE_CLIENT_SECRET}
+            redirect-uri: http://localhost:3000/oauth2/callback
             scope:
               - openid
               - email
               - profile
-          github:
-            client-id: Ov23lib9UtwdmWgU39XL
-            client-secret: de0e3d6354ca0f103b15b515d369d2ce64f29aa8
-            scope:
-              - read:user
-              - user:email
-            redirect-uri: http://localhost:8081/login/oauth2/code/github
-  datasource:
-    jpa:
-      properties:
-        hibernate:
-          default_schema: user_service
-          format_sql: true
-          ddl-auto: validate
-      show-sql: true
+  jpa:
+    properties:
+      hibernate:
+        default_schema: user_service
+        format_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: validate
   cloud:
     config:
       enabled: false
@@ -39,7 +32,7 @@ spring:
       enabled: false
 
 jwt:
-  secret: SECRET123456789qwertyuiopasdfghjklzxcvbnm123456789
+  secret: a-string-secret-at-least-256-bits-long-a-string-secret-at-least-256-bits
 
 logging:
   level:
